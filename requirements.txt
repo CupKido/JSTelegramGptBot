@@ -1,1 +1,6 @@
 npm i mongoose telegraf dotenv nodegptwrapper
+env vars:
+TELEGRAM_TOKEN
+OPENAI_API_KEY
+MONGO_URI
+DEV_IDS
