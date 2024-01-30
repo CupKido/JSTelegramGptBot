@@ -69,7 +69,7 @@ const gptRecognize = (ctx) => {
             // console.log('picobj', JSON.stringify(new gptImageMessage(message, roles.USER, photoUrl).apiObj));
             messages.push(new gptImageMessage(message, roles.USER, photoUrl));
             askGptWithHistory(models.GPT4VISION, messages, process.env.OPENAI_API_KEY).then((response) => {
-                console.log('response', response);
+                // console.log('response', response);
                 ctx.reply(response);
                 
                 result.history.push(new gptMessage(message, roles.USER).apiObj);
