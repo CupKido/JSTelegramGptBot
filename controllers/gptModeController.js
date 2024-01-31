@@ -56,16 +56,33 @@ const gpt3mode = (ctx) => {
 }
 
 const start = (ctx) => {
-    UserMode.findOne()
-    initUser(ctx.from.id, getName(ctx))
-    .then((result) => {
-        console.log(result);
-        ctx.reply('Welcome, I am gpt bot, please send a message to start!')
+    UserMode.findOne({ _id: ctx.from.id }).then((result) => {
+        if(!result){
+            initUser(ctx.from.id, getName(ctx))
+            .then((result) => {
+                console.log(result);
+                ctx.reply('Welcome, I am gpt bot, please send a message to start!\nuse /help for more info');
+            });
+        }
     });
+}
+
+const help = (ctx) => {
+    ctx.reply('Hello! this is a bot that lets you use ChatGPT\'s API in telegram\n\n' +
+    'Commands:\n' +
+    '/gpt3 - sets the mode to gpt3\n' +
+    '/gpt4 - sets the mode to gpt4\n' +
+    '/help - shows this message\n' +
+    '/myID - shows your telegram id\n' +
+    'Also, the bot supports GPT\'s vision API, so send it a picture and see what he sees!\n' +
+    'if you have suggestions or issues, please contact the admin.\n' +
+    '\n' +
+    "NOTE that only users that have been authorized by the admin can use GPT4, so if you\'re interested, contact the admin! ( https://t.me/saarta37 )");
 }
 
 module.exports = {
     gpt4mode,
     gpt3mode,
-    start
+    start,
+    help
 }

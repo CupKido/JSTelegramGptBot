@@ -4,8 +4,12 @@ const UserMode = require('../models/userMode');
 
 const gptResponse = (ctx) =>{
     // console.log('sending', ctx.message.text);
+    if(!ctx || !ctx.message || !ctx.message.text){
+        return;
+    }
     const message  =  ctx.message.text;
-    if (message.length > 20000){
+    
+    if (!message || message.length > 20000){
         ctx.reply('message too long');
         return;
     }
@@ -21,10 +25,14 @@ const gptResponse = (ctx) =>{
         // console.log('messages', messages);
         askGptWithHistory(result.mode, messages, process.env.OPENAI_API_KEY).then((response) => {
             // console.log('response', response);
+            if(!response || response === message){
+                ctx.reply('error');
+                return;
+            }
             ctx.reply(response);
 
             result.history.push(new gptMessage(message, roles.USER).apiObj);
-            result.history.push(new gptMessage(message, roles.GPT).apiObj);
+            result.history.push(new gptMessage(response, roles.GPT).apiObj);
             while(result.history.toString() > 20000 || result.history.length > 10){
                 result.history.shift();
             }
@@ -52,7 +60,10 @@ const gptRecognize = (ctx) => {
             // Use the `getFile` method to get the file path
             ctx.telegram.getFile(fileId).then((file) => {
             const photoUrl = `https://api.telegram.org/file/bot${process.env.TELEGRAM_TOKEN}/${file.file_path}`;
-            const message  =  ctx.message.caption;
+            let message = '';
+            if(ctx && ctx.message && ctx.message.caption){
+                message  =  ctx.message.caption;
+            }
             if (message.length > 20000){
                 ctx.reply('message too long');
                 return;

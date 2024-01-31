@@ -15,6 +15,8 @@ async function connectDB() {
 }
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB');
+
+    // set the devs as admins
     if(!process.env.DEV_IDS){
         return;
     }
