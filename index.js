@@ -14,7 +14,6 @@ const bot = new Telegraf(process.env.TELEGRAM_TOKEN)
 GptModeRoute(bot);
 AuthorizeRoute(bot);
 GPTRoute(bot);
-bot.help((ctx) => ctx.reply('Send me a message and I will respond'))
 bot.command('myID', (ctx) => {ctx.reply(`its ${ctx.from.id}`)})
 bot.launch()
 

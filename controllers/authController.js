@@ -31,13 +31,12 @@ const isAdmin = async (id) => {
     });
 }
 
-const authUsers = (ctx) => {
+const authUsers = (ctx) => { 
     isAdmin(ctx.from.id).then((result) => {
         if(!result){
             ctx.reply('you are not authorized to use this command');
             return;
         }
-        console.log(ctx.update.message.text);
         const userIds = ctx.update.message.text.split(' ').slice(1);
         UserModel.find().then((result) => {
             const ids = result.map((user) => {return user._id});

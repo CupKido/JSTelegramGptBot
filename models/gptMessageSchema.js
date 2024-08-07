@@ -19,7 +19,7 @@ const contentSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true,
-    }
+    },
 });
 
 const gptMessageSchema = new mongoose.Schema({
@@ -27,7 +27,12 @@ const gptMessageSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-    }
+    },
+    modelType : {
+        type: String,
+        required: false,
+    },
+
 });
 
 module.exports = gptMessageSchema
