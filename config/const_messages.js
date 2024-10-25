@@ -1,11 +1,16 @@
 const HELP_MESSAGE = 'Hello! this is a bot that lets you use ChatGPT\'s API on telegram\n\n' +
 'Commands:\n' +
-'/gpt3 - sets the mode to gpt3.5\n' +
-'/gpt4 - sets the mode to gpt4 turbo\n' +
-'/gpt4o - sets the mode to gpt4O\n' +
-'/dalle - sets the mode to dalle3 (image generation)\n' +
-'/help - shows this message\n' +
-'/myID - shows your telegram id\n' +
+'Free to use commands:\n' +
+'\t/gpt4omini - sets the mode to gpt 4O mini\n' +
+'\t/gpt3 - sets the mode to gpt3.5\n' +
+'\t/help - shows this message\n' +
+'\t/myID - shows your telegram id\n' +
+'Auth required commands (Ask admin for auth):\n' +
+'\t/gpt4 - sets the mode to gpt4 turbo\n' +
+'\t/gpt4o - sets the mode to gpt4O\n' +
+'\t/o1 - sets the mode to O1\n' + 
+'\t/o1mini - sets the mode to O1 mini\n'  +
+'\t/dalle - sets the mode to dalle3 (image generation)\n' +
 'Also, the bot supports GPT\'s vision API, so send it a picture and see what he sees!\n' +
 'if you have suggestions or issues, please contact the admin.\n' +
 '\n' +
