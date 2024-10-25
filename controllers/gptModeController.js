@@ -6,7 +6,7 @@ const initUser = (id, name) => {
     const usermode = new UserMode({
         _id: id,
         name,
-        mode: models.CHAT.GPT3,
+        mode: models.CHAT.GPT4OMINI,
     });
     return usermode.save()
 }
@@ -14,81 +14,66 @@ const initUser = (id, name) => {
 const getName = (ctx) => {
     return ctx.from.first_name + ' ' + ctx.from.last_name;
 }
+
+const swapToMode = (mode) => {
+    return async (ctx) => {
+        UserMode.findOne({ _id: ctx.from.id }).then((result) => {
+            if(!result){
+                initUser(ctx.from.id, getName(ctx))
+                .then((result) => {
+                });
+            }else{
+                result.mode = mode;
+                result.save().then((result) => {
+                });
+            }
+            ctx.reply(mode + ' mode enabled!');
+        }).catch((error) => {
+            console.log(error);
+            ctx.reply('error finding user');
+        });
+    }
+}
+
+const isUserAuthed = async (ctx) => {
+    return await UserMode.findOne({ _id: ctx.from.id }).then((result) => {
+        if(!result){
+            initUser(ctx.from.id, getName(ctx))
+            .then((result) => {
+                return false;
+            });
+        }else{
+            return result.authorized;
+        }
+    });
+}
+
+const doIfAuthed = (func) => {
+    return async (ctx) => {
+        isUserAuthed(ctx).then(async (isAuthed) => {
+            if(isAuthed) {
+                await func(ctx);
+            }
+        })
+    }
+} 
+
 // mode: 'gpt3',
 // authorized: false,
 // admin: false
-const gpt4turbomode = (ctx) => {
-    UserMode.findOne({ _id: ctx.from.id }).then((result) => {
-        if(!result){
-            initUser(ctx.from.id, getName(ctx))
-            .then((result) => {
-                ctx.reply('you are not authorized for gpt4 modes');
-            });
-        }else{
-            if(result.authorized){
-                result.mode = models.CHAT.GPT4TURBO;
-                result.save().then((result) => {
-                    ctx.reply('GPT4 turbo mode enabled!');
-                });
-            }
-        }
-    });
-}
+const gpt3mode = swapToMode(models.CHAT.GPT3)
 
-const gpt4omode = (ctx) => {
-    UserMode.findOne({ _id: ctx.from.id }).then((result) => {
-        if(!result){
-            initUser(ctx.from.id, getName(ctx))
-            .then((result) => {
-                ctx.reply('you are not authorized for gpt4 modes');
-            });
-        }else{
-            if(result.authorized){
-                result.mode = models.CHAT.GPT4O;
-                result.save().then((result) => {
-                    ctx.reply('GPT4O mode enabled!');
-                });
-            }
-        }
-    });
-}
+const gpt4ominimode = swapToMode(models.CHAT.GPT4OMINI);
 
-const dallemode = (ctx) => {
-    UserMode.findOne({ _id: ctx.from.id }).then((result) => {
-        if(!result){
-            initUser(ctx.from.id, getName(ctx))
-            .then((result) => {
-                ctx.reply('you are not authorized for gpt4 modes');
-            });
-        }else{
-            if(result.authorized){
-                result.mode = models.IMAGE_GENERATION.DALLE3;
-                result.save().then((result) => {
-                    ctx.reply('Image generation mode enabled!');
-                });
-            }
-        }
-    });
-}
+const gpt4turbomode = doIfAuthed(swapToMode(models.CHAT.GPT4TURBO));
 
-const gpt3mode = (ctx) => {
-    UserMode.findOne({ _id: ctx.from.id }).then((result) => {
-        if(!result){
-            initUser(ctx.from.id, getName(ctx))
-            .then((result) => {
-            });
-        }else{
-            result.mode = models.CHAT.GPT3;
-            result.save().then((result) => {
-            });
-        }
-        ctx.reply('GPT3 mode enabled!');
-    }).catch((error) => {
-        console.log(error);
-        ctx.reply('error finding user');
-    });
-    
-}
+const gpt4omode = doIfAuthed(swapToMode(models.CHAT.GPT4O));
+
+const dallemode = doIfAuthed(swapToMode(models.IMAGE_GENERATION.DALLE3));
+
+const gpto1mode = doIfAuthed(swapToMode(models.CHAT.O1));
+
+const gpto1minimode = doIfAuthed(swapToMode(models.CHAT.O1MINI));
 
 const start = (ctx) => {
     UserMode.findOne({ _id: ctx.from.id }).then((result) => {
@@ -106,10 +91,13 @@ const help = (ctx) => {
 }
 
 module.exports = {
+    gpt3mode,
+    gpt4ominimode,
     gpt4turbomode,
     gpt4omode,
-    gpt3mode,
     dallemode,
+    gpto1mode,
+    gpto1minimode,
     start,
     help
 }
