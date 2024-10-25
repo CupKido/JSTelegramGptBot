@@ -14,7 +14,7 @@ const userModeSchema = new mongoose.Schema({
   mode: {
     type: String,
     required: true,
-    default: models.GPT3
+    default: models.CHAT.GPT4OMINI
   },
   authorized : {
     type: Boolean,
