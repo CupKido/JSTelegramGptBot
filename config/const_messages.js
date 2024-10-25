@@ -16,6 +16,13 @@ const HELP_MESSAGE = 'Hello! this is a bot that lets you use ChatGPT\'s API on t
 '\n' +
 "NOTE that only users that have been authorized by the admin can use GPT4, so if you\'re interested, contact the admin! ( https://t.me/saarta37 )";
 
+const ADMIN_HELP_MESSAGE = 'Admin commands:\n' +
+'\t/auth - authorizes a user to use the bot\'s pricey features\n' +
+'\t/listUsers - lists all users\n' +
+'\t/announce - sends a message to all users\n' +
+'\t/tell - sends a message to a specific user\n' +
+'\t/history - shows the chat history of a user\n';
+
 const LOADING_MESSAGES = ["Just a moment, I'm working on it.",
 "Hang tight, I'm fetching the information.",
 "Loading, please wait patiently.",
@@ -30,5 +37,6 @@ const LOADING_MESSAGES = ["Just a moment, I'm working on it.",
 
 module.exports = {
     HELP_MESSAGE,
+    ADMIN_HELP_MESSAGE,
     LOADING_MESSAGES,
 }
