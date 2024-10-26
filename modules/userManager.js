@@ -1,4 +1,5 @@
 const UserMode = require('../models/userMode');
+const {models} = require('nodegptwrapper');
 
 const initUser = (id, name) => {
     const usermode = new UserMode({

@@ -1,7 +1,7 @@
 const UserMode = require('../models/userMode');
 const {models} = require('nodegptwrapper');
 const {HELP_MESSAGE, ADMIN_HELP_MESSAGE} = require('../config/const_messages');
-const { swapToMode, doIfAuthed, isUserAdmin } = require('../modules/userManager');
+const { swapToMode, doIfAuthed, isUserAdmin, initUser, getName } = require('../modules/userManager');
 
 const gpt3mode = swapToMode(models.CHAT.GPT3)
 
