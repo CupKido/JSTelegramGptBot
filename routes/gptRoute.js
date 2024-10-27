@@ -4,6 +4,22 @@ const {LOADING_MESSAGES} = require('../config/const_messages');
 
 const messagePending = [];
 
+const addToPending = (userId) => {
+    if(!messagePending.includes(userId)){
+        messagePending.push(userId);
+    }
+}
+
+const removeFromPending = (userId) => {
+    if(messagePending.includes(userId)){
+        messagePending.splice(messagePending.indexOf(userId), 1);
+    }
+}
+
+const getRandomLoadingMessage = () => {
+    return LOADING_MESSAGES[Math.floor(Math.random()*LOADING_MESSAGES.length)];
+}
+
 module.exports = (bot) => {
     bot.on(message('text'), addLoadingMessage(navigateGptMessage));
     bot.on('photo', addLoadingMessage(gptRecognize));
@@ -31,22 +47,23 @@ const addLoadingMessage = (func) => {
                 return;
             }
 
-            messagePending.push(userId);
-            const loadingMessage = await ctx.reply(LOADING_MESSAGES[Math.floor(Math.random()*LOADING_MESSAGES.length)]);
+            addToPending(userId);
+            const loadingMessage = await ctx.reply(getRandomLoadingMessage());
 
             func(ctx)
             .then(() => {
                 ctx.deleteMessage(loadingMessage.message_id);
-                messagePending.splice(messagePending.indexOf(userId), 1);
+                removeFromPending(userId);
             })
             .catch((error) => {
                 console.log('error', error);
                 ctx.deleteMessage(loadingMessage.message_id);
+                removeFromPending(userId);
                 ctx.reply('error');
             });   
         }catch(e){
             console.log('error', e);
-            messagePending.splice(messagePending.indexOf(userId), 1);
+            removeFromPending(userId);
         }
     }
 }
