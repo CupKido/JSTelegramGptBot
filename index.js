@@ -1,8 +1,7 @@
 const { Telegraf } = require('telegraf')
 const dotenv = require('dotenv')
 dotenv.config()
-const { message } = require('telegraf/filters')
-const connectDB = require('./config/db');
+const { connectDB, disconnectDB } = require('./config/db');
 const GptModeRoute = require('./routes/gptModeRoute');
 const AuthorizeRoute = require('./routes/authorizeRoute');
 const GPTRoute = require('./routes/gptRoute');
@@ -20,3 +19,5 @@ bot.launch()
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'))
 process.once('SIGTERM', () => bot.stop('SIGTERM'))
+process.once('SIGINT', () => disconnectDB())
+process.once('SIGTERM', () => disconnectDB())
