@@ -1,6 +1,6 @@
 const UserMode = require('../models/userMode');
 const { doIfAdmin } = require('../modules/userManager');
-const { splitStringByLength } = require('../utils');
+const { splitMessageAndReply } = require('../utils');
 
 const authUser = (id) => {
     return new Promise((resolve, reject) => {
@@ -94,10 +94,7 @@ const history = doIfAdmin(async (ctx) => {
             ctx.reply('user not found');
         }else{
             chatHistory = result.history.toString();
-            const messageParts = splitStringByLength(chatHistory, 2000);
-            messageParts.forEach((messagePart, index) => {
-                setTimeout(() => ctx.reply(messagePart), index * 3000);
-            });
+            splitMessageAndReply(chatHistory, 3000, ctx);
         }
     });
 });

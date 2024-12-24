@@ -1,3 +1,5 @@
+const { maxMessageLength } = require("./config/constants");
+
 function splitStringByLength(inputString, maxLength) {
     const stringArray = [];
 
@@ -8,6 +10,17 @@ function splitStringByLength(inputString, maxLength) {
     return stringArray;
 }
 
+const splitMessageAndReply = async (messageToSplit, delay, context) => {
+    if(!context.reply) {
+        return;
+    }
+    
+    const messageParts = splitStringByLength(messageToSplit, maxMessageLength)
+    messageParts.forEach((messagePart, index) => {
+        setTimeout(() => context.reply(messagePart), index * delay);
+    });
+}
+
 module.exports = {
-    splitStringByLength
+    splitMessageAndReply
 };

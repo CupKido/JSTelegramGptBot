@@ -1,5 +1,5 @@
 const { askGptWithHistory, gptImageRequest, generateImage, gptChatMessage, gptImageContent, gptMessageContent, models, roles} = require('nodegptwrapper');
-const { splitStringByLength } = require('../utils');
+const { splitMessageAndReply } = require('../utils');
 // const { askGptWithHistory, gptRecognize } = require('../gpt/wrapper');
 //console.log(models);
 const UserMode = require('../models/userMode');
@@ -42,10 +42,7 @@ const gptResponse = async (ctx) =>{
                 return;
             }
             
-            const messageParts = splitStringByLength(response, 2000);
-            messageParts.forEach((messagePart, index) => {
-                setTimeout(() => ctx.reply(messagePart), index * 3000);
-            });
+            splitMessageAndReply(response, 3000, ctx);
 
             result.history.push(new gptChatMessage(roles.USER, new gptMessageContent(message)).apiObj());
             result.history.push(new gptChatMessage(roles.GPT, new gptMessageContent(response)).apiObj());
