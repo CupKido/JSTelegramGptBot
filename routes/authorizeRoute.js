@@ -1,8 +1,14 @@
 const UserModel = require('../models/userMode');
-const { authUsers, listUsers, announce, tell, history } = require('../controllers/authController');
+const { authUsers, unlimitUsers, listUsers, announce, tell, history, deAuthUsers, deUnlimitUsers } = require('../controllers/authController');
 
 module.exports = (bot) => {
     bot.command('auth', authUsers);
+
+    bot.command('unlimit', unlimitUsers)
+
+    bot.command('deauth', deAuthUsers);
+
+    bot.command('deunlimit', deUnlimitUsers)
 
     bot.command('listUsers', listUsers);
 

@@ -18,7 +18,12 @@ const userModeSchema = new mongoose.Schema({
   },
   authorized : {
     type: Boolean,
-    required: true,
+    required: false,
+    default: false
+  },
+  unlimited : {
+    type: Boolean,
+    required: false,
     default: false
   },
   admin : {
