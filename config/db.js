@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const uri = process.env.MONGO_URI;
 // console.log(uri);
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
+
 async function connectDB() {
   try {
     // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
@@ -13,6 +14,12 @@ async function connectDB() {
     // await mongoose.disconnect();
   }
 }
+
+async function disconnectDB() {
+  await mongoose.disconnect()
+  console.log("disconnected from DB");
+}
+
 mongoose.connection.on('connected', () => {
     console.log('Mongoose connected to DB');
 
@@ -41,4 +48,13 @@ mongoose.connection.on('connected', () => {
         });
     });
   });
-module.exports = connectDB;
+
+function addOnDB(on, func) {
+  mongoose.connection.on(on, func);
+}
+
+module.exports = {
+  connectDB,
+  disconnectDB,
+  addOnDB
+}

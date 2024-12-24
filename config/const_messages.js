@@ -34,9 +34,11 @@ const LOADING_MESSAGES = ["Just a moment, I'm working on it.",
 "Taking a moment to gather the data.",
 "Almost ready, thank you for your patience."]
 
+const AUTH_REJECT_MESSAGE = 'you are not authorized to use this command'
 
 module.exports = {
     HELP_MESSAGE,
     ADMIN_HELP_MESSAGE,
     LOADING_MESSAGES,
+    AUTH_REJECT_MESSAGE,
 }
