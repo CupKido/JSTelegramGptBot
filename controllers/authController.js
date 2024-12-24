@@ -1,64 +1,30 @@
 const UserMode = require('../models/userMode');
-const { doIfAdmin } = require('../modules/userManager');
+const { doIfAdmin, changeUser, applyOnUsers, getUsersIds } = require('../modules/userManager');
 const { splitMessageAndReply } = require('../utils');
 
-const authUser = (id) => {
-    return new Promise((resolve, reject) => {
-        UserModel.findOne({ _id: id }).then((result) => {
-            if(!result){
-                const usermode = new UserModel({
-                    _id: id,
-                    authorized: true,
-                });
-                usermode.save().then((result) => {
-                    resolve(result);
-                });
-            }else{
-                result.authorized = true;
-                result.save().then((result) => {
-                    resolve(result);
-                });
-            }
-        });
-    });
-
+const authUser = async (id, value) => {
+    await changeUser(id, (usermode) => { usermode.authorized = value; });
 }
 
+const unlimitUser = async (id, value) => {
+    await changeUser(id, (usermode) => { usermode.unlimited = value; });
+}
 
+const authUsers = doIfAdmin(applyOnUsers(authUser, "Authed users", true))
+const unlimitUsers = doIfAdmin(applyOnUsers(unlimitUser, "Unlimited users", true))
+const deAuthUsers = doIfAdmin(applyOnUsers(authUser, "DeAuthed users", false))
+const deUnlimitUsers = doIfAdmin(applyOnUsers(unlimitUser, "DeUnlimited users", false))
 
-const authUsers = doIfAdmin((ctx) => { 
-    const userIds = ctx.update.message.text.split(' ').slice(1);
-    UserModel.find().then((result) => {
-        const ids = result.map((user) => {return user._id});
-        const promises = [];
-        userIds.forEach((id) => {
-            if(ids.includes(id)){
-                promises.push(authUser(id));
-            }else{
-                ctx.reply('user ' + id + ' didnt send me a message');
-                userIds.splice(userIds.indexOf(id), 1);
-            }
-        });
-        Promise.all(promises).then((result) => {
-            ctx.reply('Authed users: ' + userIds);
-        });
-    });
-});
-
-const listUsers = doIfAdmin((ctx) => {
-    UserModel.find().then((result) => {
-        ctx.reply('Users: \n' + result.map((user) =>
+const listUsers = doIfAdmin((ctx, usermode) => {
+    UserMode.find().then((result) => {
+        splitMessageAndReply('Users: \n' + result.map((user) =>
              {return `\tid: ${user._id} name: ${user.name} mode: ${user.mode} authorized: ${user.authorized} admin: ${user.admin}\n`}
-            )
-        );
+            ),
+        3000, ctx);
     });
 });
 
-const getUsersIds = async () => {
-    return UserMode.find({}, '_id').then((users) => {return users.map((user) => user._id)});
-}
-
-const announce = doIfAdmin((ctx) => {
+const announce = doIfAdmin((ctx, usermode) => {
     message = ctx.update.message.text.split(' ').slice(1).join(' ');
     getUsersIds().then((usersIds) => {
         ctx.reply(usersIds)
@@ -70,7 +36,7 @@ const announce = doIfAdmin((ctx) => {
     })
 });
 
-const tell = doIfAdmin((ctx) => {
+const tell = doIfAdmin((ctx, usermode) => {
     splitMessage = ctx.update.message.text.split(' ');
     if(splitMessage.length < 3){
         ctx.reply('please provide a user id and a message');
@@ -82,7 +48,7 @@ const tell = doIfAdmin((ctx) => {
     ctx.telegram.sendMessage(userId, message).then();
 });
 
-const history = doIfAdmin(async (ctx) => {
+const history = doIfAdmin(async (ctx, usermode) => {
     splitMessage = ctx.update.message.text.split(' ');
     if(splitMessage.length < 2){
         ctx.reply('please provide a user id');
@@ -101,6 +67,9 @@ const history = doIfAdmin(async (ctx) => {
 
 module.exports = {
     authUsers,
+    unlimitUsers,
+    deAuthUsers,
+    deUnlimitUsers,
     listUsers,
     announce,
     tell,
