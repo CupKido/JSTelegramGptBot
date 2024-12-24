@@ -90,30 +90,9 @@ const gptRecognize = async (ctx) => {
                 ctx.reply('please choose a mode first');
                 return;
             }
-            const history = result.history;
-            // console.log('history', history);
-            // const messages = history.map((message) =>{
-            //         return new gptChatMessage(message.role, new gptMessageContent(message.content[0].text));
-            // });
             const messages = [new gptChatMessage(roles.USER, new gptImageContent(message, photoUrl))];
-            // console.log('picobj', JSON.stringify(new gptImageMessage(message, roles.USER, photoUrl).apiObj));
-            // messages.push();
-            // for(const message of messages){
-            //     //console.log("content", message.content)
-            //     console.log('message', message.apiObj(), '\n');
-            // }
             await askGptWithHistory(models.IMAGE_RECOGNITION.GPT4VISION, messages, process.env.OPENAI_API_KEY).then((response) => {
-                //console.log('messages', response);
                 ctx.reply(response);
-                
-                // result.history.push(new gptChatMessage(roles.USER, new gptMessageContent(message)).apiObj());
-                // result.history.push(new gptChatMessage(roles.GPT, new gptMessageContent(response)).apiObj());
-                // while(result.history.toString() > 20000 || result.history.length > 10){
-                //     result.history.shift();
-                // }
-                //result.save().then((result) => {
-                //     console.log('saved', result);
-                // });
             }) 
             .catch((error) => {
                 ctx.reply('error');
