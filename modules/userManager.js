@@ -1,24 +1,46 @@
+const { AUTH_REJECT_MESSAGE } = require('../config/const_messages');
 const UserMode = require('../models/userMode');
 const {models} = require('nodegptwrapper');
 
-const initUser = (id, name) => {
+const initUser = async (id, name) => {
     const usermode = new UserMode({
         _id: id,
         name,
         mode: models.CHAT.GPT4OMINI,
     });
-    return usermode.save()
+    await usermode.save()
+    return usermode;
 }
 
-const getName = (ctx) => {
-    return ctx.from.first_name + ' ' + ctx.from.last_name;
+const findAndConfirmInit = async (from) => {
+    return await UserMode.findOne({ _id: from.id }).then(async (result) => {
+        if(!result){
+            return await initUser(from.id, getName(from))
+        }
+
+        return result;
+    });
+}
+
+const getUser = async (id) => {
+    return await UserMode.findOne({ _id: id })
+}
+
+const deleteUser = async (id) => {
+    await UserMode.deleteOne({ _id: id });
+}
+
+const getName = (from) => {
+    return from.first_name + ' ' + from.last_name;
 }
 
 const swapToMode = (mode) => {
-    return async (ctx) => {
+    return async (ctx, usermode) => {
+        usermode.moded = mode;
+        usermode.save();
         UserMode.findOne({ _id: ctx.from.id }).then((result) => {
             if(!result){
-                initUser(ctx.from.id, getName(ctx))
+                initUser(ctx.from.id, getName(ctx.from))
                 .then((result) => {
                 });
             }else{
@@ -34,66 +56,93 @@ const swapToMode = (mode) => {
     }
 }
 
-const isUserAuthed = async (ctx) => {
-    return await UserMode.findOne({ _id: ctx.from.id }).then((result) => {
-        if(!result){
-            initUser(ctx.from.id, getName(ctx))
-            .then((result) => {
-                return false;
-            });
-        }else{
-            return result.authorized;
+const doIfUserFit = (funcToDo, predicate, rejectMessage) => {
+    return async (ctx) => {
+        const usermode = await findAndConfirmInit(ctx.from);
+        if(predicate(usermode)){
+            await funcToDo(ctx, usermode);
         }
-    });
+        else {
+            await ctx.reply(rejectMessage);
+        }
+    }
 }
 
-const doIfAuthed = (func) => {
-    return async (ctx) => {
-        isUserAuthed(ctx).then(async (isAuthed) => {
-            if(isAuthed) {
-                await func(ctx);
-            }
-            else {
-                await ctx.reply('you are not authorized to use this command');
-            }
-        })
-    }
+const doIfInit = (funcToDo) => {
+    return doIfUserFit(funcToDo, (user) => true, AUTH_REJECT_MESSAGE)
+}
+
+const doIfAuthed = (funcToDo) => {
+    return doIfUserFit(funcToDo, (user) => user.authorized, AUTH_REJECT_MESSAGE)
 } 
 
-const isUserAdmin = async (ctx) => {
-    return UserModel.findOne({ _id: ctx.from.id }).then((result) => {
-        if(!result){
-            initUser(ctx.from.id, getName(ctx))
-            .then((result) => {
-                return false;
-            });
-        }
-        if(!result.admin){
-            return false;
-        }
-        return true;
-    });
+const doIfUnlimited = (funcToDo) => {
+    return doIfUserFit(funcToDo, (user) => user.unlimited, AUTH_REJECT_MESSAGE)
+} 
+
+const doIfAdmin = (funcToDo) => {
+    return doIfUserFit(funcToDo, (user) => user.admin, AUTH_REJECT_MESSAGE)
+} 
+
+const changeUser = async (id, userChangingFunc) => {
+    const usermode = await UserMode.findOne({ _id: id });
+    if(usermode) {
+        userChangingFunc(usermode);
+        await usermode.save();
+    }
 }
 
-const doIfAdmin = (func) => {
-    return async (ctx) => {
-        isUserAdmin(ctx).then(async (isAdmin) => {
-            if(isAdmin) {
-                await func(ctx);
-            }
-            else {
-                await ctx.reply('you are not authorized to use this command');
-            }
+const changeUserWithInit = async (from, userChangingFunc) => {
+    const usermode = await UserMode.findOne({ _id: from.id }).then(async (result) => {
+        if(!result){
+            return await initUser(from.id, getName(from))
+        }
+
+        return result;
+    });
+
+    userChangingFunc(usermode);
+    await usermode.save();
+}
+
+const getUsersIds = async () => {
+    return await UserMode.find({}, '_id').then((users) => {return users.map((user) => user._id)});
+}
+
+const applyOnUsers = (funcToApply, message, value) => {
+    return async (ctx, usermode) => {
+        const userIds = ctx.update.message.text.split(' ').slice(1);
+        getUsersIds().then((ids) => {
+            const promises = [];
+            userIds.forEach((id) => {
+                if(ids.includes(id)){
+                    promises.push(new Promise(async (resolve, reject) => {
+                        resolve(await funcToApply(id, value));
+                    }));
+                }else{
+                    ctx.reply('user ' + id + ' didnt send me a message');
+                    userIds.splice(userIds.indexOf(id), 1);
+                }
+            });
+            Promise.all(promises).then((result) => {
+                ctx.reply(message + ': ' + userIds);
+            });
         });
     }
-} 
+}
 
 module.exports = {
     initUser,
-    isUserAuthed,
+    getUser,
+    getUsersIds,
+    deleteUser,
+    doIfInit,
     doIfAuthed,
+    doIfUnlimited,
     swapToMode,
     getName,
-    isUserAdmin,
     doIfAdmin,
+    changeUserWithInit,
+    changeUser,
+    applyOnUsers
 }
