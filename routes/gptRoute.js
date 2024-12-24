@@ -39,8 +39,14 @@ const navigateGptMessage = async (ctx) =>{
 
 const addLoadingMessage = (func) => {
     return async (ctx) => {
+        if(isIdValid(ctx)) {
+            console.log("error" + ctx)
+            return;
+        }
+
+        let userId = ctx.from.id;
+
         try {
-            userId = ctx.from.id;
             if(messagePending.includes(userId)){
                 ctx.reply('waittttt! cant take more than 1 request at a time');
 
@@ -58,12 +64,17 @@ const addLoadingMessage = (func) => {
             .catch((error) => {
                 console.log('error', error);
                 ctx.deleteMessage(loadingMessage.message_id);
-                removeFromPending(userId);
                 ctx.reply('error');
+                removeFromPending(userId);
             });   
         }catch(e){
+            ctx.reply('error');
             console.log('error', e);
             removeFromPending(userId);
         }
     }
+}
+
+function isIdValid(ctx) {
+    return !ctx || !ctx.from || !ctx.from.id;
 }
