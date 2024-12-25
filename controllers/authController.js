@@ -1,5 +1,5 @@
 const UserMode = require('../models/userMode');
-const { doIfAdmin, changeUser, applyOnUsers, getUsersIds } = require('../modules/userManager');
+const { changeUser, applyOnUsers, getUsersIds } = require('../modules/userManager');
 const { splitMessageAndReply } = require('../utils');
 
 const authUser = async (id, value) => {
@@ -10,21 +10,21 @@ const unlimitUser = async (id, value) => {
     await changeUser(id, (usermode) => { usermode.unlimited = value; });
 }
 
-const authUsers = doIfAdmin(applyOnUsers(authUser, "Authed users", true))
-const unlimitUsers = doIfAdmin(applyOnUsers(unlimitUser, "Unlimited users", true))
-const deAuthUsers = doIfAdmin(applyOnUsers(authUser, "DeAuthed users", false))
-const deUnlimitUsers = doIfAdmin(applyOnUsers(unlimitUser, "DeUnlimited users", false))
+const authUsers = applyOnUsers(authUser, "Authed users", true)
+const unlimitUsers = applyOnUsers(unlimitUser, "Unlimited users", true)
+const deAuthUsers = applyOnUsers(authUser, "DeAuthed users", false)
+const limitUsers = applyOnUsers(unlimitUser, "DeUnlimited users", false)
 
-const listUsers = doIfAdmin((ctx, usermode) => {
+const listUsers = (ctx, usermode) => {
     UserMode.find().then((result) => {
         splitMessageAndReply('Users: \n' + result.map((user) =>
              {return `\tid: ${user._id} name: ${user.name} mode: ${user.mode} authorized: ${user.authorized} admin: ${user.admin}\n`}
             ),
         3000, ctx);
     });
-});
+}
 
-const announce = doIfAdmin((ctx, usermode) => {
+const announce = (ctx, usermode) => {
     message = ctx.update.message.text.split(' ').slice(1).join(' ');
     getUsersIds().then((usersIds) => {
         ctx.reply(usersIds)
@@ -34,9 +34,9 @@ const announce = doIfAdmin((ctx, usermode) => {
                 .catch((error) => {console.log(error + '\nunable to send announcement to ' + userId)});
         })
     })
-});
+}
 
-const tell = doIfAdmin((ctx, usermode) => {
+const tell = (ctx, usermode) => {
     splitMessage = ctx.update.message.text.split(' ');
     if(splitMessage.length < 3){
         ctx.reply('please provide a user id and a message');
@@ -46,9 +46,9 @@ const tell = doIfAdmin((ctx, usermode) => {
     message = splitMessage.slice(2).join(' ');
     ctx.reply('telling ' + userId + ' ' + message);
     ctx.telegram.sendMessage(userId, message).then();
-});
+}
 
-const history = doIfAdmin(async (ctx, usermode) => {
+const history = async (ctx, usermode) => {
     splitMessage = ctx.update.message.text.split(' ');
     if(splitMessage.length < 2){
         ctx.reply('please provide a user id');
@@ -63,13 +63,13 @@ const history = doIfAdmin(async (ctx, usermode) => {
             splitMessageAndReply(chatHistory, 3000, ctx);
         }
     });
-});
+}
 
 module.exports = {
     authUsers,
     unlimitUsers,
     deAuthUsers,
-    deUnlimitUsers,
+    limitUsers,
     listUsers,
     announce,
     tell,
