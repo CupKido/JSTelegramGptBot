@@ -16,7 +16,12 @@ const gpto1mode = swapToMode(models.CHAT.O1);
 
 const gpto1minimode = swapToMode(models.CHAT.O1MINI);
 
+const getMode = async (ctx, usermode) => {
+    await ctx.reply("your mode is currently: " + usermode.mode);
+}
+
 module.exports = {
+    getMode,
     gpt3mode,
     gpt4ominimode,
     gpt4turbomode,

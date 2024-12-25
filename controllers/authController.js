@@ -1,6 +1,7 @@
 const UserMode = require('../models/userMode');
 const { changeUser, applyOnUsers, getUsersIds } = require('../modules/userManager');
 const { splitMessageAndReply } = require('../utils');
+const {models} = require('nodegptwrapper');
 
 const authUser = async (id, value) => {
     await changeUser(id, (usermode) => { usermode.authorized = value; });
@@ -8,6 +9,10 @@ const authUser = async (id, value) => {
 
 const unlimitUser = async (id, value) => {
     await changeUser(id, (usermode) => { usermode.unlimited = value; });
+}
+
+const resetUserMode = async (id, value) => {
+    await changeUser(id, (usermode) => { usermode.mode = models.CHAT.GPT4OMINI; });
 }
 
 const authUsers = applyOnUsers(authUser, "Authed users", true)
@@ -18,7 +23,7 @@ const limitUsers = applyOnUsers(unlimitUser, "DeUnlimited users", false)
 const listUsers = (ctx, usermode) => {
     UserMode.find().then((result) => {
         splitMessageAndReply('Users: \n' + result.map((user) =>
-             {return `\tid: ${user._id} name: ${user.name} mode: ${user.mode} authorized: ${user.authorized} admin: ${user.admin}\n`}
+             {return `\tid: ${user._id} name: ${user.name} mode: ${user.mode} authorized: ${user.authorized} unlimited: ${user.unlimited} admin: ${user.admin}\n`}
             ),
         3000, ctx);
     });
@@ -65,11 +70,14 @@ const history = async (ctx, usermode) => {
     });
 }
 
+const resetUsersMode = applyOnUsers(resetUserMode, "Reset users mode", false)
+
 module.exports = {
     authUsers,
     unlimitUsers,
     deAuthUsers,
     limitUsers,
+    resetUsersMode,
     listUsers,
     announce,
     tell,
