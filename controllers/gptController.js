@@ -12,7 +12,6 @@ const getMode = async (ctx) => {
         }
         return result.mode;
     });
-
 }
 
 const gptResponse = async (ctx) =>{
