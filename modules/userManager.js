@@ -68,22 +68,6 @@ const doIfUserFit = (funcToDo, predicate, rejectMessage) => {
     }
 }
 
-const doIfInit = (funcToDo) => {
-    return doIfUserFit(funcToDo, (user) => true, AUTH_REJECT_MESSAGE)
-}
-
-const doIfAuthed = (funcToDo) => {
-    return doIfUserFit(funcToDo, (user) => user.authorized, AUTH_REJECT_MESSAGE)
-} 
-
-const doIfUnlimited = (funcToDo) => {
-    return doIfUserFit(funcToDo, (user) => user.unlimited, AUTH_REJECT_MESSAGE)
-} 
-
-const doIfAdmin = (funcToDo) => {
-    return doIfUserFit(funcToDo, (user) => user.admin, AUTH_REJECT_MESSAGE)
-} 
-
 const changeUser = async (id, userChangingFunc) => {
     const usermode = await UserMode.findOne({ _id: id });
     if(usermode) {
@@ -136,12 +120,9 @@ module.exports = {
     getUser,
     getUsersIds,
     deleteUser,
-    doIfInit,
-    doIfAuthed,
-    doIfUnlimited,
+    doIfUserFit,
     swapToMode,
     getName,
-    doIfAdmin,
     changeUserWithInit,
     changeUser,
     applyOnUsers

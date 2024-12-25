@@ -1,24 +1,13 @@
-
-const { gpt4turbomode, gpt4omode, dallemode, gpt3mode, start, help, gpto1mode, gpto1minimode, gpt4ominimode } = require('../controllers/gptModeController');
-
-
+const { start, help } = require('../controllers/generalController');
+const { doIfUserFit } = require('../modules/userManager');
+const { ifAny } = require('../modules/userQueries');
+const { modeCommands, generalCommands } = require('./commandRoute');
+const { initCommandsRoute } = require('./routesUtil');
 
 module.exports = (bot) => {
-    bot.command('gpt3', gpt3mode);
-    
-    bot.command('gpt4omini', gpt4ominimode)
+    initCommandsRoute(bot, modeCommands);
 
-    bot.command('gpt4o', gpt4omode);
-    
-    bot.command('dalle', dallemode);
-    
-    bot.command('gpt4', gpt4turbomode);
+    bot.start(doIfUserFit(start, ifAny));
 
-    bot.command('o1', gpto1mode);
-
-    bot.command('o1mini', gpto1minimode);
-
-    bot.start(start);
-
-    bot.help(help);
+    bot.help(doIfUserFit(help, ifAny));
 }
