@@ -8,6 +8,5 @@ module.exports = (bot) => {
     initCommandsRoute(bot, modeCommands);
 
     bot.start(doIfUserFit(start, ifAny));
-
     bot.help(doIfUserFit(help, ifAny));
 }

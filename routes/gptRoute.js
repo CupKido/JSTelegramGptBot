@@ -23,7 +23,7 @@ const getRandomLoadingMessage = () => {
 module.exports = (bot) => {
     bot.on(message('text'), addLoadingMessage(navigateGptMessage));
     bot.on('photo', addLoadingMessage(gptRecognize));
-}
+} 
 
 const navigateGptMessage = async (ctx) =>{
     const mode = await getMode(ctx);
