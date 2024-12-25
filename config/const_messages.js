@@ -16,12 +16,15 @@ const HELP_MESSAGE = 'Hello! this is a bot that lets you use ChatGPT\'s API on t
 '\n' +
 "NOTE that only users that have been authorized by the admin can use GPT4, so if you\'re interested, contact the admin! ( https://t.me/saarta37 )";
 
-const ADMIN_HELP_MESSAGE = 'Admin commands:\n' +
-'\t/auth - authorizes a user to use the bot\'s pricey features\n' +
-'\t/listUsers - lists all users\n' +
-'\t/announce - sends a message to all users\n' +
-'\t/tell - sends a message to a specific user\n' +
-'\t/history - shows the chat history of a user\n';
+const HELP_START = 'Hello! this is a bot that lets you use ChatGPT\'s API on telegram\n\n' +
+'Commands:\n' +
+'\t/help - shows this message\n' +
+'\t/myID - shows your telegram id\n';
+
+const HELP_END = 'Also, the bot supports GPT\'s vision API, so send it a picture and see what he sees!\n' +
+'if you have suggestions or issues, please contact the admin.\n' +
+'\n' +
+"NOTE that the users that have been authorized by the admin can a lot more models, so if you\'re interested, contact the admin! ( https://t.me/saarta37 )";
 
 const LOADING_MESSAGES = ["Just a moment, I'm working on it.",
 "Hang tight, I'm fetching the information.",
@@ -38,7 +41,8 @@ const AUTH_REJECT_MESSAGE = 'you are not authorized to use this command'
 
 module.exports = {
     HELP_MESSAGE,
-    ADMIN_HELP_MESSAGE,
+    HELP_START,
+    HELP_END,
     LOADING_MESSAGES,
     AUTH_REJECT_MESSAGE,
 }
