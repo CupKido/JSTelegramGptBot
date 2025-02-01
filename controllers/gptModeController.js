@@ -16,6 +16,8 @@ const gpto1mode = swapToMode(models.CHAT.O1);
 
 const gpto1minimode = swapToMode(models.CHAT.O1MINI);
 
+const gpto3minimode = swapToMode(models.CHAT.O3MINI);
+
 const getMode = async (ctx, usermode) => {
     await ctx.reply("your mode is currently: " + usermode.mode);
 }
@@ -29,4 +31,5 @@ module.exports = {
     dallemode,
     gpto1mode,
     gpto1minimode,
+    gpto3minimode,
 }

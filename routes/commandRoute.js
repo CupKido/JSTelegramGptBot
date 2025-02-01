@@ -1,4 +1,4 @@
-const { gpt4turbomode, gpt4omode, dallemode, gpt3mode, gpto1mode, gpto1minimode, gpt4ominimode, getMode } = require('../controllers/gptModeController');
+const { gpt4turbomode, gpt4omode, dallemode, gpt3mode, gpto1mode, gpto1minimode, gpt4ominimode, getMode, gpto3minimode } = require('../controllers/gptModeController');
 const { authUsers, unlimitUsers, listUsers, announce, tell, history, deAuthUsers, limitUsers, resetUsersMode } = require('../controllers/authController');
 const { ifUserAuthorized, ifAny, ifUserUnlimited, ifUserAdmin } = require('../modules/userQueries');
 
@@ -9,11 +9,6 @@ function getIfDo(predicate, method, description) {
         "what" : description
     }
 }
-
-// const generalCommands = {
-//     "help" : getIfDo(ifAny, help),
-//     "start" : getIfDo(ifAny, start)
-// }
 
 const modeCommands = { 
     "o1" : { 
@@ -37,8 +32,13 @@ const modeCommands = {
         "what" : "sets the mode to gpt 4"
     },
     "o1mini" : { 
-        "if" : ifUserAuthorized,
+        "if" : ifAny,
         "do" : gpto1minimode,
+        "what" : "sets the mode to gpt O1 mini"
+    },
+    "o3mini" : { 
+        "if" : ifAny,
+        "do" : gpto3minimode,
         "what" : "sets the mode to gpt O1 mini"
     },
     "gpt4omini" : { 
