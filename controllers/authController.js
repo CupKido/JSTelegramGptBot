@@ -2,7 +2,11 @@ const UserMode = require('../models/userMode');
 const { changeUser, applyOnUsers, getUsersIds } = require('../modules/userManager');
 const { splitMessageAndReply } = require('../utils');
 const {models} = require('nodegptwrapper');
+const { createLogger, transports } = require("winston");
 
+const logger = createLogger({
+  transports: [new transports.Console]
+});
 const authUser = async (id, value) => {
     await changeUser(id, (usermode) => { usermode.authorized = value; });
 }
@@ -36,7 +40,7 @@ const announce = (ctx, usermode) => {
         usersIds.forEach((userId) => {
                 ctx.telegram.sendMessage(userId, message)
                 .then()
-                .catch((error) => {console.log(error + '\nunable to send announcement to ' + userId)});
+                .catch((error) => {logger.error(error + '\nunable to send announcement to ' + userId)});
         })
     })
 }

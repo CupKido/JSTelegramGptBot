@@ -1,14 +1,18 @@
 const mongoose = require('mongoose');
 const uri = process.env.MONGO_URI;
-// console.log(uri);
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
+const { createLogger, transports } = require("winston");
 
+const logger = createLogger({
+  transports: [new transports.Console]
+});
+  
 async function connectDB() {
   try {
     // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
     await mongoose.connect(uri, clientOptions);
     await mongoose.connection.db.admin().command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    logger.info("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await mongoose.disconnect();
@@ -17,11 +21,11 @@ async function connectDB() {
 
 async function disconnectDB() {
   await mongoose.disconnect()
-  console.log("disconnected from DB");
+  logger.warn("disconnected from DB");
 }
 
 mongoose.connection.on('connected', () => {
-    console.log('Mongoose connected to DB');
+    logger.info('Mongoose connected to DB');
 
     // set the devs as admins
     if(!process.env.DEV_IDS){
@@ -38,7 +42,7 @@ mongoose.connection.on('connected', () => {
                     admin: true
                 });
                 usermode.save().then((result) => {
-                    console.log(result);
+                    logger.debug(result);
                 });
             }else{
                 result.admin = true;

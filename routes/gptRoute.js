@@ -1,7 +1,11 @@
 const {getMode, gptResponse, gptGenerateImage, gptRecognize, models} = require('../controllers/gptController');
 const { message } = require('telegraf/filters')
 const {LOADING_MESSAGES} = require('../config/const_messages');
+const { createLogger, transports } = require("winston");
 
+const logger = createLogger({
+  transports: [new transports.Console]
+});
 const messagePending = [];
 
 const addToPending = (userId) => {
@@ -28,7 +32,6 @@ module.exports = (bot) => {
 const navigateGptMessage = async (ctx) =>{
     const mode = await getMode(ctx);
 
-    console.log(Object.values(models.IMAGE_GENERATION).includes(mode), Object.values(models.IMAGE_GENERATION), mode)
     if (mode && Object.values(models.IMAGE_GENERATION).includes(mode)) {
         await gptGenerateImage(ctx);
     }
@@ -40,7 +43,7 @@ const navigateGptMessage = async (ctx) =>{
 const addLoadingMessage = (func) => {
     return async (ctx) => {
         if(isIdValid(ctx)) {
-            console.log("error" + ctx)
+            logger.error(ctx)
             return;
         }
 
@@ -62,14 +65,14 @@ const addLoadingMessage = (func) => {
                 removeFromPending(userId);
             })
             .catch((error) => {
-                console.log('error', error);
+                logger.error(error);
                 ctx.deleteMessage(loadingMessage.message_id);
                 ctx.reply('error');
                 removeFromPending(userId);
             });   
         }catch(e){
             ctx.reply('error');
-            console.log('error', e);
+            logger.error(e);
             removeFromPending(userId);
         }
     }

@@ -1,5 +1,10 @@
 const { askGptWithHistory, gptImageRequest, generateImage, gptChatMessage, gptImageContent, gptMessageContent, models, roles} = require('nodegptwrapper');
 const { splitMessageAndReply } = require('../utils');
+const { createLogger, transports } = require("winston");
+
+const logger = createLogger({
+  transports: [new transports.Console]
+});
 // const { askGptWithHistory, gptRecognize } = require('../gpt/wrapper');
 //console.log(models);
 const UserMode = require('../models/userMode');
@@ -15,7 +20,6 @@ const getMode = async (ctx) => {
 }
 
 const gptResponse = async (ctx) =>{
-    // console.log('sending', ctx.message.text);
     if(!ctx || !ctx.message || !ctx.message.text){
         return;
     }
@@ -55,9 +59,9 @@ const gptResponse = async (ctx) =>{
         .catch((error) => {
             ctx.reply('error');
             if(error.response.data){
-                console.log(error.response.data);
+                logger.error(error.response.data);
             }else{
-                console.log(error);
+                logger.error(error);
             }
         })
 
@@ -96,9 +100,9 @@ const gptRecognize = async (ctx) => {
             .catch((error) => {
                 ctx.reply('error');
                 if(error.response.data){
-                    console.log(error.response.data);
+                    logger.error(error.response.data);
                 }else{
-                    console.log(error);
+                    logger.error(error);
                 }
             })
         });

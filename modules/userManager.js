@@ -1,7 +1,11 @@
 const { AUTH_REJECT_MESSAGE } = require('../config/const_messages');
 const UserMode = require('../models/userMode');
 const {models} = require('nodegptwrapper');
+const { createLogger, transports } = require("winston");
 
+const logger = createLogger({
+  transports: [new transports.Console]
+});
 const initUser = async (id, name) => {
     const usermode = new UserMode({
         _id: id,
@@ -50,7 +54,7 @@ const swapToMode = (mode) => {
             }
             ctx.reply(mode + ' mode enabled!');
         }).catch((error) => {
-            console.log(error);
+            logger.error(error);
             ctx.reply('error finding user');
         });
     }

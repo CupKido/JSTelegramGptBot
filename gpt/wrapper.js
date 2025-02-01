@@ -3,6 +3,11 @@ const axios = require('axios');
 const models = require('nodegptwrapper');
 const roles = require('nodegptwrapper');
 const gptApiUrl = "https://api.openai.com/v1/chat/completions"
+const { createLogger, transports } = require("winston");
+
+const logger = createLogger({
+  transports: [new transports.Console]
+});
 
 const askGptWithHistory = async (model, history, apiKey) => {
     const body = {
@@ -30,8 +35,8 @@ const gptRecognize = async (text, picUrl, apiKey) => {
         'Content-Type': 'application/json',
     }
     return axios.post(gptApiUrl, body, {headers}).then((res) => {
-        console.log(res)
-        console.log(res.data)
+        logger.debug(res)
+        logger.debug(res.data)
         return res.data.choices[0].message.content;
     });
 }
